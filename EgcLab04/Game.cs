@@ -168,8 +168,16 @@ public class Game : GameWindow
 
         // --- Obiectul selectat: mouse-ul (secțiunea 9) -------------------------------
 
-        // TODO (T3): la clic stânga, obiectul selectat se mută în punctul din lume aflat sub cursor
-        //            (folosiți ScreenToWorld; Depth nu se schimbă)
+        // T3: Mutam obiectul selectat la pozitia cursorului.
+        if (MouseState.IsButtonPressed(MouseButton.Left))
+        {
+            Vector2 mouseWorld = ScreenToWorld(MouseState.Position);
+
+            sel.Transform.Position = mouseWorld;
+
+            // T3: Modificam doar pozitia X si Y.
+            // Adancimea (Depth) obiectului ramane neschimbata.
+        }
 
         // TODO (T4, facultativ): clic dreapta = pivot; tasta P ținută = rotație în jurul pivotului
 
@@ -250,8 +258,24 @@ public class Game : GameWindow
     /// <summary>Transformă poziția mouse-ului (pixeli, origine stânga-sus) în coordonate de lume.</summary>
     private Vector2 ScreenToWorld(Vector2 mousePixels)
     {
-        // TODO (T3): pasul 1 (pixel → NDC), apoi pasul 2 (NDC → lume, cu inversa lui view * projection)
-        return Vector2.Zero;
+        // T3: Convertim coordonatele mouse-ului din pixeli in NDC.
+        float x = 2.0f * mousePixels.X / ClientSize.X - 1.0f;
+        float y = 1.0f - 2.0f * mousePixels.Y / ClientSize.Y;
+
+        // T3: Axa Y a mouse-ului creste in jos, iar in NDC creste in sus.
+        // De aceea folosim 1 - pentru a inversa directia axei Y.
+
+        Vector4 ndc = new Vector4(x, y, 0.0f, 1.0f);
+
+        // T3: Calculam inversa matricelor view si projection.
+        Matrix4 inverse = Matrix4.Invert(
+            _camera.ViewMatrix * _camera.ProjectionMatrix
+        );
+
+        // T3: Transformam coordonatele NDC in coordonate de lume.
+        Vector4 world = Vector4.TransformRow(ndc, inverse);
+
+        return new Vector2(world.X / world.W, world.Y / world.W);
     }
 
     /// <summary>Tasta R: obiectele revin la transformările inițiale, camera la starea inițială.</summary>
