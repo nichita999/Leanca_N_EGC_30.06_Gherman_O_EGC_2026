@@ -64,7 +64,12 @@ public class Game : GameWindow
         AddObject("pătrat", Shapes.Quad(),
                   new Transform2D { Position = new Vector2(-1.8f, -1.0f), Depth = -3.0f });
         AddObject("triunghi", Shapes.Triangle(),
-                  new Transform2D { Position = new Vector2(-1.2f, 1.0f) });
+          new Transform2D
+          {
+              Position = new Vector2(-1.2f, 1.0f),
+              Rotation = 45,
+              Scale = new Vector2(1.5f, 0.5f)
+          });
         AddObject("hexagon", Shapes.RegularPolygon(6, 0.5f),
                   new Transform2D { Position = new Vector2(2.0f, 1.0f) });
         AddObject("cerc", Shapes.RegularPolygon(64, 0.5f),
