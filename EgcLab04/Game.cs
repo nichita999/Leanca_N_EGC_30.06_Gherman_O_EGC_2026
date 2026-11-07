@@ -25,6 +25,9 @@ public class Game : GameWindow
     private int _selected;            // indexul obiectului selectat în _scene (tasta Tab)
     private bool _wireframe;          // contur (true) sau plin (false)
 
+    // T4: Punctul in jurul caruia se roteste obiectul.
+    private Vector2 _pivot = Vector2.Zero;
+
     // Contoare afișate în titlul ferestrei.
     private readonly string _baseTitle;
     private double _secondTimer;
@@ -179,7 +182,40 @@ public class Game : GameWindow
             // Adancimea (Depth) obiectului ramane neschimbata.
         }
 
-        // TODO (T4, facultativ): clic dreapta = pivot; tasta P ținută = rotație în jurul pivotului
+        // T4: La clic dreapta stabilim pivotul in pozitia cursorului.
+        if (MouseState.IsButtonPressed(MouseButton.Right))
+        {
+            _pivot = ScreenToWorld(MouseState.Position);
+        }
+
+        // T4: Rotim obiectul selectat in jurul pivotului.
+        if (KeyboardState.IsKeyDown(Keys.P))
+        {
+            float angle = MathHelper.DegreesToRadians(90.0f * dt);
+
+            // Calculam pozitia obiectului fata de pivot.
+            Vector2 relative = sel.Transform.Position - _pivot;
+
+            // Rotim vectorul in jurul originii.
+            float cos = MathF.Cos(angle);
+            float sin = MathF.Sin(angle);
+
+            Vector2 rotated = new Vector2(
+                relative.X * cos - relative.Y * sin,
+                relative.X * sin + relative.Y * cos
+            );
+
+            // Readucem obiectul in sistemul de coordonate al lumii.
+            sel.Transform.Position = _pivot + rotated;
+
+            // Rotim si obiectul in jurul propriului centru.
+            sel.Transform.Rotation += 90.0f * dt;
+        }
+
+        // T4: Scadem coordonatele pivotului pentru a efectua
+        // rotatia fata de origine, apoi adaugam pivotul inapoi.
+        // Modificam si unghiul propriu pentru a pastra orientarea
+        // obiectului fata de pivot, asemenea Lunii fata de Pamant.
 
         // --- Camera: tastatura și rotița (secțiunea 6.2) -----------------------------
 
